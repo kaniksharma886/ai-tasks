@@ -1,13 +1,14 @@
-from langchain_core.documents import Document
-import os
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
 import config
+import os
 
 
 def get_embedding_model():
     return FastEmbedEmbeddings(model_name=config.EMBEDDING_MODEL)
+
 
 def get_retriever():
     embeddings = get_embedding_model()
@@ -21,17 +22,17 @@ def get_retriever():
 def insert_text(file_paths: list[str]):
     """Chunking of 500 with 20% overlap"""
     embeddings = get_embedding_model()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=config.RAG_CHUNK_SIZE, chunk_overlap=config.RAG_CHUNK_OVERLAP)
     
     processed_documents = []
     
     for path in file_paths:
         if not os.path.exists(path):
-            print(f"File ignored :{path}")
+            utils.log(f"File ignored :{path}")
             continue
 
         filename = os.path.basename(path)
-        print(f"Reading {filename}")
+        utils.log(f"Reading {filename}")
         with open(path, "r") as f:
             text = f.read()
             
@@ -39,11 +40,21 @@ def insert_text(file_paths: list[str]):
         for idx, chunk in enumerate(chunks):
             processed_documents.append(Document(page_content=chunk, metadata={"source": filename, "chunk_id": idx}))
             
-    print(f"Total segments: {len(processed_documents)}.")
+    utils.log(f"Total segments: {len(processed_documents)}.") 
+    
+    '''    
+    Total in this case were 142592 segments, so even though its not recommended 
+    I'll have to commit the vector db also. 
+    Otherwise it will take 2 - 3 hours to ingest at your end.
+    
+    Batching is needed for the same reason.
+    A total of 143 batches ran for indexing.
+    
+    '''
     
     batch_size = 1000
     for i in range(0, len(processed_documents), batch_size):
-        print(f"Indexing for batch: {i}")
+        utils.log(f"Indexing for batch: {i}")
         batch = processed_documents[i:i + batch_size]
         Chroma.from_documents(
             documents=batch,
@@ -51,4 +62,6 @@ def insert_text(file_paths: list[str]):
             persist_directory=config.DB_DIR,
             collection_name=config.COLLECTION_NAME
         )
-        
+
+
+

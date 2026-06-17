@@ -91,7 +91,7 @@ Top-5 RAG Failed : {(tot_cnt - pass_cnt)}
 
 P50 Latency      : {p50_time} ms
 P95 Latency      : {p95_time} ms
-
+P99 Latency      : {p99_time} ms
 """
 
 
