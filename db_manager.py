@@ -43,11 +43,7 @@ def fetch_last_messages(db_path=config.DB_PATH, limit=config.MESSAGE_HISTORY_LIM
         
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute("""
-            SELECT role, content FROM (
-                SELECT id, role, content FROM message_history ORDER BY id DESC LIMIT ?
-            ) ORDER BY id ASC
-        """, (limit,))
+        cursor.execute("""SELECT role, content FROM (SELECT id, role, content FROM message_history ORDER BY id DESC LIMIT ?) ORDER BY id ASC""", (limit,))
         rows = cursor.fetchall()
         conn.close()
     except Exception as e2:

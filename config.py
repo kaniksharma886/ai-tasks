@@ -13,7 +13,15 @@ COST_PER_OUTPUT_TOKEN = 1.25 / 1000000
 
 # General configuration
 EXIT_STRING = "exit"
-MESSAGE_HISTORY_LIMIT = 10
+MESSAGE_HISTORY_LIMIT = 10                  # 1 System msg and 10 chat history messages
+
+DB_DIR = "./db"
+DB_PATH = f"{DB_DIR}/chat_history.db"
+RAG_DIR = "./documents"
 
 
-DB_PATH = "./db/chat_history.db"
+COLLECTION_NAME = "file_collection"
+EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5" # BAAI/bge-small-en-v1.5 is as I cannot access open ai embedding models here. This is one of the lightest built on c++
+
+TOP_K_RESULTS = 5
+
