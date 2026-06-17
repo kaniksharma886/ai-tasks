@@ -5,3 +5,4 @@ uvicorn
 langchain_community
 fastembed
 chromadb
+langchain-classic

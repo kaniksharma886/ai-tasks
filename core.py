@@ -2,6 +2,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain.chat_models import init_chat_model
 import prompt_config as pconfig
 import db_manager as db
+import rag_manager
 import config
 import utils
 import time
@@ -17,16 +18,12 @@ def start_streaming_chat():
     except Exception as e:
         utils.log(f"Error: Failed to get retriever: {e}")
         return
-    
-    try:
-        model = config.MODEL_NAME
-        temp = config.MODEL_TEMPERATURE
-        base_url = config.OPENAI_BASE_URL
 
-        model = init_chat_model(model, temperature=temp,base_url=base_url)
-        
+
+    try:
+        model = init_chat_model(config.MODEL_NAME, temperature=config.MODEL_TEMPERATURE, base_url=config.OPENAI_BASE_URL)
     except Exception as e:
-        utils.log(f"Error : Failed to load model {model}': {e}")
+        utils.log(f"Error : Failed to load model {config.MODEL_NAME}': {e}")
         return
 
     # Initialize conversation history
@@ -126,6 +123,10 @@ User Query: {user_input}"""
             # Append complete response to history
             conversation_history.append(AIMessage(content=ai_response))
             db.save_message("assistant", ai_response)
+            
+            # to keep in memory chat history <= 10 : 1 System + 10 User/AI 
+            while len(conversation_history) > config.MESSAGE_HISTORY_LIMIT + 1:
+                conversation_history.pop(1)
             
             # Calculate output token
             try:

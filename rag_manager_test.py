@@ -10,27 +10,27 @@ QUERIES = [
 
     {"query": "Who said 'I should not shout, if I were you'?", "src": "file1.txt"},
     {"query": "Who does a lot of 'sitting and thinking' these days?", "src": "file1.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
 
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
 
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
 
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "faile2.txt"}
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"}
    
 ]
 
@@ -85,14 +85,14 @@ def create_test_report():
     utils.log(f"""
 METRICS TEST REPORT
 
-Total Queries    : {tot_cnt}")
-Top-5 RAG Passed : {pass_cnt}
-Top-5 RAG Failed : {(tot_cnt - pass_cnt)}
+Total Queries        : {tot_cnt}
+Top-5 RAG Passed     : {pass_cnt}
+Top-5 RAG Failed     : {(tot_cnt - pass_cnt)}
 
-P50 Latency      : {p50_time} ms
-P95 Latency      : {p95_time} ms
-P99 Latency      : {p99_time} ms
-"""
+P50 Latency (Median) : {p50_time} ms
+P95 Latency          : {p95_time} ms
+P99 Latency          : {p99_time} ms
+""")
 
 
 if __name__ == "__main__":
