@@ -27,7 +27,7 @@ msg = ""
 
 with col2:
     if st.button("Send"):
-        resp, telemetry = core.chat_helper(msg)
+        resp, telemetry = core.chat_helper(msg, False)
         st.session_state.llm_msg += str(resp) +"\n"
         st.session_state.telemetry_data += str(telemetry) + "\n"
 
