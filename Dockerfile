@@ -1,5 +1,6 @@
 FROM python:3.11-slim
 
+RUN useradd -m -u 1000 appuser							  
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
@@ -16,10 +17,10 @@ COPY . .
 
 RUN mkdir -p /apps/datacom/app/
 
-RUN chmod -R 777 /apps/datacom/app/
+RUN chown -R appuser:appuser /apps/datacom/app/
 
-USER root
+USER appuser
 
 EXPOSE 8001
 
-CMD ["python", "-m", "uvicorn", "core:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["streamlit", "run", "ui.py", "--server.port", "8001", "--server.address", "0.0.0.0"]
