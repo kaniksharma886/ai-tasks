@@ -82,7 +82,7 @@ def create_test_report():
     p95_time = np.percentile(rag_latencies, 95)
     p99_time = np.percentile(rag_latencies, 99)
 
-    utils.log(f"""
+    res = f"""
 METRICS TEST REPORT
 
 Total Queries        : {tot_cnt}
@@ -92,8 +92,9 @@ Top-5 RAG Failed     : {(tot_cnt - pass_cnt)}
 P50 Latency (Median) : {p50_time} ms
 P95 Latency          : {p95_time} ms
 P99 Latency          : {p99_time} ms
-""")
+"""
+    return res
 
 
 if __name__ == "__main__":
-    create_test_report()
+    utils.log(create_test_report())

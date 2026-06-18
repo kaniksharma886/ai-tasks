@@ -7,3 +7,4 @@ fastembed
 chromadb
 langchain-classic
 pytest
+streamlit
