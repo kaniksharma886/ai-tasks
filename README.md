@@ -2,7 +2,7 @@
 Created for AI tasks
 
 
-##Step to clone:
+## Step to clone:
 
 1. Run this to clone the repo - git clone https://github.com/kaniksharma886/ai-tasks.git
 
@@ -14,28 +14,28 @@ Created for AI tasks
 
 
 
-##Step to run in CLI mode:
+## Step to run in CLI mode:
 
-###1. Run following to set API key:
+### 1. Run following to set API key:
 
 export OPENAI_API_KEY=<API Key without quotes>
 
 
 
-###2. Task 3.1 and 3.2 (a), (b), (c)
+### 2. Task 3.1 and 3.2 (a), (b), (c)
 
 cd ai-tasks
 run "python3 chat.py"
 
 
 
-###3. Task 3.2 (d)
+### 3. Task 3.2 (d)
 cd ai-tasks
 run "python3 rag_manager_test.py"
 
 
 
-###4. Task 3.3
+### 4. Task 3.3
 cd ai-tasks
 run "python3 travel_agent.py"
 
@@ -43,12 +43,12 @@ run "python3 travel_agent.py"
 
 
 
-###5. Task 3.4
+### 5. Task 3.4
 cd ai-tasks
 run "python3 coding_helper.py"
 
 
-###6. Stretch task
+### 6. Stretch task
 
 	1. Update docker-compose.yml and set OPENAI_API_KEY
 	2. cd ai-tasks
