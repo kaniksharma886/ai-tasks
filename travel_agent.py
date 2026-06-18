@@ -51,46 +51,56 @@ def search_attractions(location: str, budget: float) -> str:
 
 def run_trip_planner_agent(user_prompt: str):
     tools = [get_weather, search_attractions]
-
+    
     try:
         model = init_chat_model(config.MODEL_NAME, temperature=config.MODEL_TEMPERATURE, base_url=config.OPENAI_BASE_URL)
     except Exception as e:
         utils.log(f"Error : Failed to load model {config.MODEL_NAME}': {e}")
-        return
+        return ""
 
-    
-    model_with_structure = model.with_structured_output(TripItinerary)
-    
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", pconfig.SYSTEM_MESSAGE_TRAVEL_AGENT),
-        ("placeholder", "{chat_history}"),
-        ("human", "{input}"),
-        ("placeholder", "{agent_scratchpad}"),
-    ])
-    
-    
-    travel_agent = create_tool_calling_agent(model, tools, prompt)
-    
-    agent_executor = AgentExecutor(
-        agent=travel_agent, 
-        tools=tools, 
-        verbose=True, # To make scratch-pad visible in logs
-        handle_parsing_errors=True)
+    try:
+        model_with_structure = model.with_structured_output(TripItinerary)
         
-    agent_step_output = agent_executor.invoke({"input": user_prompt})
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", pconfig.SYSTEM_MESSAGE_TRAVEL_AGENT),
+            ("placeholder", "{chat_history}"),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ])
+        
+        
+        travel_agent = create_tool_calling_agent(model, tools, prompt)
+        
+        agent_executor = AgentExecutor(
+            agent=travel_agent, 
+            tools=tools, 
+            verbose=True, # To make scratch-pad visible in logs
+            handle_parsing_errors=True)
+            
+        agent_step_output = agent_executor.invoke({"input": user_prompt})
 
-    int_resp = agent_step_output['output']
-    utils.log("LLM Resp : ",json.dumps(int_resp, indent=4))
-    
-    # Re-invoking to ensure output format is aligned with JSON
-    final_structured_json = model_with_structure.invoke(
-        f"Based on your research for the prompt '{user_prompt}', format the final itinerary: {agent_step_output['output']}"
-    )    
-    return final_structured_json
+        int_resp = agent_step_output['output']
+        utils.log("LLM Resp : ",json.dumps(int_resp, indent=4))
+        
+        # Re-invoking to ensure output format is aligned with JSON
+        structure_prompt = f"Based on your research for the prompt '{user_prompt}', format the final itinerary: {agent_step_output['output']}"
+        retry = 3
+        while retry > 0:
+            try:
+                final_structured_json = model_with_structure.invoke(structure_prompt)
+                retry = 0
+            except:
+                utils.log("Retrying...")
+                retry -= 1 
+
+        res_jsn = str(json.dumps(final_structured_json.model_dump(), indent=4))
+
+        return res_jsn
+    except Exception as e1:
+        return """{"status": "Error", "message":str(e1)}"""
 
 
 if __name__ == "__main__":
     prompt = "Plan a 2-day trip to Auckland for under NZ$500"
     result = run_trip_planner_agent(prompt)
-    
-    utils.log("Final Resp : ",json.dumps(result.model_dump(), indent=4))
+    utils.log("Final Resp : ", result)

@@ -27,8 +27,9 @@ def chat_helper(user_input, use_rag=False):
         return
 
     # Initialize conversation history
+    sys_msg = pconfig.SYSTEM_MESSAGE_RAG if use_rag else pconfig.SYSTEM_MESSAGE
     conversation_history = [
-        SystemMessage(content=pconfig.SYSTEM_MESSAGE)
+        SystemMessage(content=sys_msg)
     ]
     
     past_messages = db.fetch_last_messages()
@@ -68,7 +69,17 @@ def chat_helper(user_input, use_rag=False):
     
     try:
         st_time = time.perf_counter()
-        resp = model.invoke(conversation_history)
+        retry = 3
+        resp = None
+        while retry > 0:
+            try:
+                print(">>",conversation_history,"<<")
+                resp = model.invoke(conversation_history)
+                retry = 0
+            except:
+                utils.log("Retrying...")
+                retry -= 1
+        
         ai_response = resp.content
         end_time = time.perf_counter()
         latency = int((end_time - st_time) * 1000)
@@ -99,7 +110,7 @@ def chat_helper(user_input, use_rag=False):
         return ai_response, f"\n[stats] prompt={prompt_tokens} completion={completion_tokens} cost=${total_cost:.6f} latency={latency}ms"
 
     except Exception as e:
-        return "", f"Error: Response failed : {e}"
+        return "AI Error", f"Error: Response failed : {e}"
 
 
 
@@ -192,7 +203,6 @@ User Query: {user_input}"""
         st_time = time.perf_counter()
         utils.log("LLM:")
         try:
-            
             for chunk in model.stream(conversation_history):
                 try:
                     token = chunk.content if type(chunk.content) == type("") else chunk.content[0]["text"]

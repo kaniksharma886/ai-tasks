@@ -1,10 +1,14 @@
+import rag_manager_test
 import streamlit as st
+import travel_agent
 import config
 import core
-import rag_manager_test
-
+import json
 
 st.title("Dashboard")
+col1, col2 = st.columns([4, 1])
+
+
 
 if "llm_msg" not in st.session_state:
     st.session_state.llm_msg = ""
@@ -12,38 +16,38 @@ if "llm_msg" not in st.session_state:
 if "telemetry_data" not in st.session_state:
     st.session_state.telemetry_data = ""
 
+if "msg" not in st.session_state:
+    st.session_state.msg = ""
 
-st.text(f"""Chat Started.
+if "run_list" not in st.session_state:
+    st.session_state.run_list = []
 
-This LLM based chat can reply to all queries that can be covered by the model's training data.
-
-It has abount 50 MB of text from different free novels. 
-Responses related to novel stories will have a high level of bias towards the information from novel.
-
-Chat history is saved and LLM will refer to last {config.MESSAGE_HISTORY_LIMIT} messages.
-
-""")
+msg = ""
 
 
-
-msg = st.text_input("User message")
-
-if st.button("Send"):
-    resp, telemetry = core.chat_helper(msg)
-    st.session_state.llm_msg += str(resp) +"\n"
-    st.session_state.telemetry_data += str(telemetry) + "\n"
-
-st.text_area("LLM Response", value=st.session_state.llm_msg)
-
-st.text_area("Latency Data", value= st.session_state.telemetry_data)
+with col2:
+    if st.button("Send"):
+        resp, telemetry = core.chat_helper(msg)
+        st.session_state.llm_msg += str(resp) +"\n"
+        st.session_state.telemetry_data += str(telemetry) + "\n"
 
 
+    if st.button("RAG test"):
+        st.session_state.msg, st.session_state.run_list = rag_manager_test.create_test_report()
+
+    if st.button("Agent result"):
+        prompt = "Plan a 2-day trip to Auckland for under NZ$500"
+        st.text_input(prompt)
+        travel_result = json.loads(travel_agent.run_trip_planner_agent(prompt))
+        st.text("PASS: Cost is <= 500" if travel_result["total_cost"] <= 500 else "Cost is more than 500" )
+        st.text_area("Agent Result", f"{travel_result}")
 
 
+with col1:
+    msg = st.text_input("User message")
+    st.text_area("LLM Response", value = st.session_state.llm_msg)
+    st.text_area("Latency Data", value = st.session_state.telemetry_data)
+    st.text_area("RAG result", value = st.session_state.msg)
+    st.bar_chart(st.session_state.run_list)
 
-if st.button("RAG result"):
-	st.info("Retrieval accuracy curves")
-
-if st.button("Agent result"):
-	st.warning("Agent success/failure")
 

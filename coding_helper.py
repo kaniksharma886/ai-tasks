@@ -63,14 +63,29 @@ def create_code(user_prompt, past_errors=None):
         conversation_history.append(HumanMessage(content=error_prompt))
 
     final_structured_json = ""
-    try:            
-        code = model.invoke(conversation_history)
+    try:
+        retry = 3
+        while retry > 0:
+            try:
+                code = model.invoke(conversation_history)
+                retry = 0
+            except:
+                utils.log("Retrying...")
+                retry -= 1 
+        
         code_str = code.content
         
         utils.log(f"\nCode: {code_str}")
         format_prompt = f"Based on your response for the prompt '{user_prompt}', format the final response: {code_str}"
         print(format_prompt)
-        final_structured_json = model_with_structure.invoke(format_prompt)
+        retry = 3
+        while retry > 0:
+            try:
+                final_structured_json = model_with_structure.invoke(format_prompt)
+                retry = 0
+            except:
+                utils.log("Retrying...")
+                retry -= 1 
         
         
     except Exception as e:

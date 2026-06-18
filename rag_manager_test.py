@@ -11,26 +11,26 @@ QUERIES = [
     {"query": "Who said 'I should not shout, if I were you'?", "src": "file1.txt"},
     {"query": "Who does a lot of 'sitting and thinking' these days?", "src": "file1.txt"},
     {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "What comes after 'At last Mother said to Father'?", "src": "pg1874.txt"},
+    {"query": "Who said 'I expect it's the subscription to the Vicar's testimonial'", "src": "pg1874.txt"},
+    
+    {"query": "Where did Peter cringed and shuffled his boots?", "src": "pg1874.txt"},
+    {"query": "Who said 'You'll promise this, too, won't you' ?", "src": "pg1874.txt"},    
+    {"query": "Who said 'I do not often laugh, sir'?", "src": "pg1257.txt"},
+    {"query": "Who said 'Your Excellency is safe and sound'?", "src": "pg1257.txt"},
+    {"query": "Who said 'Exactly as I have the honor to tell your Excellency'?", "src": "pg1257.txt"},
 
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
+    {"query": "What's the number of capter 'CHRISTMAS AT THE FARM'?", "src": "pg22163.txt"},
+    {"query": "Where had coming from the mountains, the three youths expected to go back to?", "src": "pg22163.txt"},
+    {"query": "Who asked : Didn't they say some parts were haunted?", "src": "pg22163.txt"},
+    {"query": "When was ebook #24375 released ?", "src": "pg24375.txt"},
+    {"query": "Who put on his most pleasant expression?", "src": "pg24375.txt"},
 
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"},
-    {"query": "Who is saying 'And you’re all dirty, too, Telescope'?", "src": "file2.txt"}
+    {"query": "Who said 'I would be most grateful'?", "src": "pg24375.txt"},
+    {"query": "When was eBook #27609 updates?", "src": "pg27609.txt"},
+    {"query": "Who said 'Good luck, my boy, on your journey'?", "src": "pg27609.txt"},
+    {"query": "Who was like a symbol from the sunken City?", "src": "pg27609.txt"},
+    {"query": "What is the release date of ebook #43936?", "src": "pg43936.txt"}
    
 ]
 
@@ -86,15 +86,18 @@ def create_test_report():
 METRICS TEST REPORT
 
 Total Queries        : {tot_cnt}
+
 Top-5 RAG Passed     : {pass_cnt}
+
 Top-5 RAG Failed     : {(tot_cnt - pass_cnt)}
 
-P50 Latency (Median) : {p50_time} ms
+P50 Latency (Median) : {p50_time} ms (This should be < 300 ms)
+
 P95 Latency          : {p95_time} ms
-P99 Latency          : {p99_time} ms
 """
-    return res
+    return res, rag_latencies
 
 
 if __name__ == "__main__":
-    utils.log(create_test_report())
+    res, _ = create_test_report()
+    utils.log(res)
