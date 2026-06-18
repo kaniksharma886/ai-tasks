@@ -1,0 +1,10 @@
+langchain
+langchain-openai
+langchain-anthropic
+uvicorn
+langchain_community
+fastembed
+chromadb
+langchain-classic
+pytest
+streamlit

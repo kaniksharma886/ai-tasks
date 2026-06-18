@@ -1,0 +1,67 @@
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import FastEmbedEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_core.documents import Document
+import config
+import os
+
+
+def get_embedding_model():
+    return FastEmbedEmbeddings(model_name=config.EMBEDDING_MODEL)
+
+
+def get_retriever():
+    embeddings = get_embedding_model()
+    vector_store = Chroma(persist_directory=config.DB_DIR,
+        embedding_function=embeddings,
+        collection_name=config.COLLECTION_NAME)
+    # Set k=5 to extract the top 5 most relevant results
+    return vector_store.as_retriever(search_kwargs={"k": config.TOP_K_RESULTS})
+
+
+def insert_text(file_paths: list[str]):
+    """Chunking of 500 with 20% overlap"""
+    embeddings = get_embedding_model()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=config.RAG_CHUNK_SIZE, chunk_overlap=config.RAG_CHUNK_OVERLAP)
+    
+    processed_documents = []
+    
+    for path in file_paths:
+        if not os.path.exists(path):
+            utils.log(f"File ignored :{path}")
+            continue
+
+        filename = os.path.basename(path)
+        utils.log(f"Reading {filename}")
+        with open(path, "r") as f:
+            text = f.read()
+            
+        chunks = text_splitter.split_text(text)
+        for idx, chunk in enumerate(chunks):
+            processed_documents.append(Document(page_content=chunk, metadata={"source": filename, "chunk_id": idx}))
+            
+    utils.log(f"Total segments: {len(processed_documents)}.") 
+    
+    '''    
+    Total in this case were 142592 segments, so even though its not recommended 
+    I'll have to commit the vector db also. 
+    Otherwise it will take 2 - 3 hours to ingest at your end.
+    
+    Batching is needed for the same reason.
+    A total of 143 batches ran for indexing.
+    
+    '''
+    
+    batch_size = 1000
+    for i in range(0, len(processed_documents), batch_size):
+        utils.log(f"Indexing for batch: {i}")
+        batch = processed_documents[i:i + batch_size]
+        Chroma.from_documents(
+            documents=batch,
+            embedding=embeddings,
+            persist_directory=config.DB_DIR,
+            collection_name=config.COLLECTION_NAME
+        )
+
+
+
