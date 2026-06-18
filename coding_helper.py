@@ -3,21 +3,35 @@ from langchain.chat_models import init_chat_model
 from pydantic import BaseModel, Field
 import prompt_config as pconfig
 from typing import List, Type
+import subprocess
 import config
 import utils
 import json
+import stat
+import os
 
 
 class CodingResponse(BaseModel):
     task: str  = Field(description="Initial coding task")
-    code: str = Field(description="Programming language code")
+    code: str = Field(description="Programming language code. Provide RAW code only. DO NOT wrap it in markdown block backticks like ```python.")
     status: str = Field(description="PASS or FAIL, depending on if code is working or not")
     errors: str = Field(description="All comilation errors (if any)")
     
 
-def run_code(code: str) -> str:
-    pass
-    
+def run_code(file_path: str) -> str:
+    # Run the command and capture the output
+    result = subprocess.run(["python3", file_path], capture_output=True, text=True)
+
+    print("Standard Output:")
+    print(result.stdout)
+
+    if result.stderr:
+        print("Standard Error:")
+        print(result.stderr)
+        return str(result.stderr)
+    else:
+        return ""
+
 
 def create_code(user_prompt, past_errors=None):
 
@@ -42,13 +56,36 @@ def create_code(user_prompt, past_errors=None):
         utils.log(f"\nCode: {code.content}")
         format_prompt = f"Based on your response for the prompt '{user_prompt}', format the final response: {code.content}"
         print(format_prompt)
-        final_structured_json = model_with_structure.invoke(format_prompt) 
+        final_structured_json = model_with_structure.invoke(format_prompt)
     except Exception as e:
         utils.log(f"Error: Response failed : {e}")
     return final_structured_json
 
 
+
+
 if __name__ == "__main__":
     prompt = "Write code to add 4 numbers in python"
     result = create_code(user_prompt=prompt)
-    utils.log("Final Resp : ", result)
+    utils.log(f"Final Resp : {result}")
+    
+    if result and result.code:
+        raw_code = result.code
+        
+        if raw_code.startswith("```python"):
+            raw_code = raw_code.replace("```python", "", 1)
+        elif raw_code.startswith("```"):
+            raw_code = raw_code.replace("```", "", 1)
+            
+        if raw_code.endswith("```"):
+            raw_code = raw_code.rsplit("```", 1)[0]
+            
+        clean_code = raw_code.strip()
+        
+        file_path = "sandpit/generated_script.py"
+        
+        with open(file_path, "w") as f:
+            f.write(clean_code)
+        
+        print(run_code(file_path))
+        
