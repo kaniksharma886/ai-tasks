@@ -65,8 +65,10 @@ def create_code(user_prompt, past_errors=None):
     final_structured_json = ""
     try:            
         code = model.invoke(conversation_history)
-        utils.log(f"\nCode: {code.content}")
-        format_prompt = f"Based on your response for the prompt '{user_prompt}', format the final response: {code.content}"
+        code_str = code.content
+        
+        utils.log(f"\nCode: {code_str}")
+        format_prompt = f"Based on your response for the prompt '{user_prompt}', format the final response: {code_str}"
         print(format_prompt)
         final_structured_json = model_with_structure.invoke(format_prompt)
         
@@ -84,10 +86,12 @@ if __name__ == "__main__":
     max_tries = 3
     cnt = 0
     while cnt < max_tries:
-        prompt = "Write code to create a fastapi python code for a school student result website."
+        prompt = "Write code to create a simple fastapi python code for a school."
 
         result = create_code(user_prompt=prompt, past_errors=errors)
-
+        output = ""
+        errors = ""
+        file_path = ""
         if result and result.code:
             raw_code = result.code
             output, errors, file_path = run_code(raw_code)
